@@ -82,11 +82,11 @@ int main()
 
     // load models
     // -----------
-    Model ourModel(FileSystem::getPath("resources/objects/backpack/backpack.obj"));
+    Model ourModel(FileSystem::getPath("resources/objects/illixr/scene.obj"));
 
     
     // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
 
     // render loop
     // -----------

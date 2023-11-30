@@ -19,7 +19,7 @@ enum Camera_Movement {
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
 const float SPEED       =  2.5f;
-const float SENSITIVITY =  0.1f;
+const float SENSITIVITY =  0.005f;
 const float ZOOM        =  45.0f;
 
 
@@ -66,6 +66,17 @@ public:
         return glm::lookAt(Position, Position + Front, Up);
     }
 
+    glm::mat4 GetCircleViewMatrix()
+    {
+        float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+        glm::mat4 view;
+        return glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0)); 
+        
+    }
+
+
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     void ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
@@ -86,8 +97,8 @@ public:
         xoffset *= MouseSensitivity;
         yoffset *= MouseSensitivity;
 
-        Yaw   += xoffset;
-        Pitch += yoffset;
+        Yaw   += xoffset;  //偏航角
+        Pitch += yoffset;  //俯仰角
 
         // make sure that when pitch is out of bounds, screen doesn't get flipped
         if (constrainPitch)

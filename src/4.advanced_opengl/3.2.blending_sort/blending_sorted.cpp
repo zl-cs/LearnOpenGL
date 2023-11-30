@@ -235,7 +235,7 @@ int main()
         // draw objects
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 view = camera.GetCircleViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
@@ -245,26 +245,32 @@ int main()
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, 36);  // start rendering 
+        std::cout << "******* Draw first cude **********" << std::endl;
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        std::cout << "******* Draw second cude **********" << std::endl;
         // floor
         glBindVertexArray(planeVAO);
         glBindTexture(GL_TEXTURE_2D, floorTexture);
         model = glm::mat4(1.0f);
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+        std::cout << "******* Draw Floor **********" << std::endl;
         // windows (from furthest to nearest)
         glBindVertexArray(transparentVAO);
         glBindTexture(GL_TEXTURE_2D, transparentTexture);
+        unsigned int x = 0;
         for (std::map<float, glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
         {
             model = glm::mat4(1.0f);
             model = glm::translate(model, it->second);
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
+            x++;
+            std::cout << "******* Draw window : " << x <<std::endl;
         }
 
 

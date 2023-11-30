@@ -181,6 +181,8 @@ private:
             bool skip = false;
             for(unsigned int j = 0; j < textures_loaded.size(); j++)
             {
+                // std::cout << "*******texture_load*****str.C_Str(): " << str.C_Str() << std::endl;
+                // std::cout << "*******texture_load*****path.data(): " << textures_loaded[j].path.data() << std::endl;
                 if(std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0)
                 {
                     textures.push_back(textures_loaded[j]);
@@ -191,6 +193,7 @@ private:
             if(!skip)
             {   // if texture hasn't been loaded already, load it
                 Texture texture;
+                // std::cout << "******!skip*****str.C_Str(): " << str.C_Str() << std::endl;
                 texture.id = TextureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();
