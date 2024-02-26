@@ -117,7 +117,7 @@ int main()
     // -----------------------------
     setupOpenGLState();
 
-    // vs是顶点着色器，fs是片段着色器，由于这个例子中透明的窗口会涉及到blending操作，所以切分渲染时的着色器会有些不同，demo可以不考虑这一点
+    // vs是顶点着色器，fs是片段着色器，由于这个例子中透明的窗口会涉及到blending操作，所以切分渲染时的着色器会有些不同，demo可以不考虑
     // Shader screenShader("3.2.blending.vs", "3.2.blending.fs");
     Shader screenShader("/home/zhang/code/LearnOpenGL/src/4.advanced_opengl/3.4.blending_thread/5.1.framebuffers_screen.vs", "/home/zhang/code/LearnOpenGL/src/4.advanced_opengl/3.4.blending_thread/5.0.framebuffers_screen.fs");
     Shader screenShader2("/home/zhang/code/LearnOpenGL/src/4.advanced_opengl/3.4.blending_thread/5.1.framebuffers_screen.vs", "/home/zhang/code/LearnOpenGL/src/4.advanced_opengl/3.4.blending_thread/3.1.window_blending.fs");
@@ -181,24 +181,24 @@ int main()
         clock_t start,end,cube,floor,win,queue; //定义clock_t变量
         start = clock(); 
 
-        // start three threads to render the cube, floor and window
-        i += 1;
 
-        thread cube_rendering_thread(cube_rendering,i,viewport[2],viewport[3]); // render the cube and rendered data is stored in myQueue
-        thread floor_rendering_thread(floor_rendering,i,viewport[2],viewport[3]); // render the floor and rendered data is stored in myQueue
-        thread window_rendering_thread(window_rendering,i,viewport[2],viewport[3]); // render the window and rendered data is stored in myQueue
+        i += 1;
+        thread cube_rendering_thread(cube_rendering,i,viewport[2],viewport[3]);
+        thread floor_rendering_thread(floor_rendering,i,viewport[2],viewport[3]);
+        thread window_rendering_thread(window_rendering,i,viewport[2],viewport[3]);
         cube_rendering_thread.detach();//join(); 
         cube = clock();
         floor_rendering_thread.detach();
         floor = clock();
         window_rendering_thread.detach();
         win = clock();
-    
+        // cube_rendering(i,viewport[2],viewport[3]);
+        // floor_rendering(shader, i,viewport[2],viewport[3]);
         int m = 0;
         
         std::map<int, std::vector<unsigned char>,std::greater<int> > myMap;
         std::vector<unsigned char> whole_pixels(viewport[2]*viewport[3]*4); // *4 for RGBA
-        // read rendered data from queue and store them in myMap
+
         while (true) {
             std::unique_lock<std::mutex> lock(mtx);
             cv.wait(lock, [] {return !myQueue.empty(); });
@@ -212,10 +212,12 @@ int main()
             if (m == 3) break;
         }
         queue = clock();
-        
-        // render whole scene absed on myMap
+        // glDisable(GL_DEPTH_TEST);
+        // glEnable(GL_BLEND);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         for (const auto& pair : myMap) {
-            // std::cout << "Key: " << pair.first << std::endl;
+            std::cout << "Key: " << pair.first << std::endl;
 #ifdef DEBUG
             if (pair.second.size() >= 4) {
                 unsigned char alpha = pair.second[3];
@@ -260,12 +262,11 @@ int main()
 #endif
         }
         end = clock(); 
-        cout << "Frame Num:" << i << endl; 
         cout << "whole time = " << double(end-start)/CLOCKS_PER_SEC << "s" << endl;  
-        // cout << "cube time = " << double(cube-start)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "floor time = " << double(floor-cube)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "window time = " << double(win-floor)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "queue time = " << double(queue-win)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "cube time = " << double(cube-start)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "floor time = " << double(floor-cube)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "window time = " << double(win-floor)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "queue time = " << double(queue-win)/CLOCKS_PER_SEC << "s" << endl;
 
 
         glReadPixels(0, 0, viewport[2],viewport[3], GL_RGBA, GL_UNSIGNED_BYTE, whole_pixels.data());

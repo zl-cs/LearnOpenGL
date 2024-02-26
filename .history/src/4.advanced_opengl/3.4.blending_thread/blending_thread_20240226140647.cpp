@@ -183,10 +183,9 @@ int main()
 
         // start three threads to render the cube, floor and window
         i += 1;
-
-        thread cube_rendering_thread(cube_rendering,i,viewport[2],viewport[3]); // render the cube and rendered data is stored in myQueue
-        thread floor_rendering_thread(floor_rendering,i,viewport[2],viewport[3]); // render the floor and rendered data is stored in myQueue
-        thread window_rendering_thread(window_rendering,i,viewport[2],viewport[3]); // render the window and rendered data is stored in myQueue
+        thread cube_rendering_thread(cube_rendering,i,viewport[2],viewport[3]);
+        thread floor_rendering_thread(floor_rendering,i,viewport[2],viewport[3]);
+        thread window_rendering_thread(window_rendering,i,viewport[2],viewport[3]);
         cube_rendering_thread.detach();//join(); 
         cube = clock();
         floor_rendering_thread.detach();
@@ -198,7 +197,7 @@ int main()
         
         std::map<int, std::vector<unsigned char>,std::greater<int> > myMap;
         std::vector<unsigned char> whole_pixels(viewport[2]*viewport[3]*4); // *4 for RGBA
-        // read rendered data from queue and store them in myMap
+
         while (true) {
             std::unique_lock<std::mutex> lock(mtx);
             cv.wait(lock, [] {return !myQueue.empty(); });
@@ -212,10 +211,12 @@ int main()
             if (m == 3) break;
         }
         queue = clock();
-        
-        // render whole scene absed on myMap
+        // glDisable(GL_DEPTH_TEST);
+        // glEnable(GL_BLEND);
+        // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         for (const auto& pair : myMap) {
-            // std::cout << "Key: " << pair.first << std::endl;
+            std::cout << "Key: " << pair.first << std::endl;
 #ifdef DEBUG
             if (pair.second.size() >= 4) {
                 unsigned char alpha = pair.second[3];
@@ -260,12 +261,11 @@ int main()
 #endif
         }
         end = clock(); 
-        cout << "Frame Num:" << i << endl; 
         cout << "whole time = " << double(end-start)/CLOCKS_PER_SEC << "s" << endl;  
-        // cout << "cube time = " << double(cube-start)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "floor time = " << double(floor-cube)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "window time = " << double(win-floor)/CLOCKS_PER_SEC << "s" << endl;
-        // cout << "queue time = " << double(queue-win)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "cube time = " << double(cube-start)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "floor time = " << double(floor-cube)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "window time = " << double(win-floor)/CLOCKS_PER_SEC << "s" << endl;
+        cout << "queue time = " << double(queue-win)/CLOCKS_PER_SEC << "s" << endl;
 
 
         glReadPixels(0, 0, viewport[2],viewport[3], GL_RGBA, GL_UNSIGNED_BYTE, whole_pixels.data());

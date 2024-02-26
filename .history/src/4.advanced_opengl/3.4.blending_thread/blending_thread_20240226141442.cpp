@@ -183,7 +183,6 @@ int main()
 
         // start three threads to render the cube, floor and window
         i += 1;
-
         thread cube_rendering_thread(cube_rendering,i,viewport[2],viewport[3]); // render the cube and rendered data is stored in myQueue
         thread floor_rendering_thread(floor_rendering,i,viewport[2],viewport[3]); // render the floor and rendered data is stored in myQueue
         thread window_rendering_thread(window_rendering,i,viewport[2],viewport[3]); // render the window and rendered data is stored in myQueue
@@ -260,7 +259,6 @@ int main()
 #endif
         }
         end = clock(); 
-        cout << "Frame Num:" << i << endl; 
         cout << "whole time = " << double(end-start)/CLOCKS_PER_SEC << "s" << endl;  
         // cout << "cube time = " << double(cube-start)/CLOCKS_PER_SEC << "s" << endl;
         // cout << "floor time = " << double(floor-cube)/CLOCKS_PER_SEC << "s" << endl;
